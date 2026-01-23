@@ -1,0 +1,9 @@
+CXX_STD = CXX17
+CXXFLAGS = -O2 -Wall -mtune=generic -static-libgcc -static-libstdc++
+# Пути К ТВОИМ DLL которые уже в inst/libs/x64/
+PKG_CXXFLAGS = $(shell "${R_HOME}/bin/Rscript.exe" -e "Rcpp:::CxxFlags()") \
+               $(shell "${R_HOME}/bin/Rscript.exe" -e "RcppParallel:::CxxFlags()")
+
+# Ключевое: линкуемся с DLL из НАШЕГО ПАКЕТА
+PKG_LIBS = -L"../inst/libs/x64" -ltbb -ltbbmalloc -lRcppParallel
+

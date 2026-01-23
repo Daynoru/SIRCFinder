@@ -1,0 +1,8 @@
+#!/bin/sh
+
+echo "Configuring for Windows..."
+
+# Копируем DLL из нашего пакета в папку сборки
+cp inst/libs/x64/*.dll src/
+
+echo "DLL copied to src directory"

@@ -1,0 +1,74 @@
+#' Performs SIRC-to-SIRC distance analysis using PERCON algorithm
+#'
+#' The function takes fasta file of SIRC sequences and makes analysis of
+#' inter-SIRC distance using PERCON algorithm, makes distance matrix,
+#' creates minimum spanning tree from the distance matrix and detects
+#' communities via label-propagation-like algorithm.
+#'
+#' @param fasta_file Path to fasta file containing SIRC sequences.
+#' @param k Which k-meres to use to compute k-meres dictionaries for PERCON.
+#' @param n_iter Number of iterations to calculate f_random (the number of
+#'   identical k-mers in random sequences of the same length as the given
+#'   SIRC pair).
+#' @param num_threads Number of threads to use for parallel processing.
+#' @param return_mst Whether to add minimum spanning tree analysis to the
+#'   results list.
+#' @param interspecies Whether to perform AMOVA-like analysis. IMPORTANT NOTE:
+#'   AMOVA-like analysis requires special formatting of sequence names in
+#'   fasta file: ">Species.name_SIRC_ID" - the sequence name will be separated
+#'   into 2 parts by first appearance of "_" symbol - first part will be
+#'   species name, second - SIRC identifier.
+#'
+#' @details
+#' The function percon_distance_matrix() takes fasta as input and performs
+#' full analysis on SIRC pairwise comparisons by calculation of PERCON ro
+#' values (Kazakov et al., 2003), formation of a fully-connected graph with
+#' label propagation algorithm community detection, minimum-spanning tree
+#' construction of a graph, and in cases of interspecies comparisons performs
+#' (argument interspecies = TRUE) performs AMOVA-like analysis calculating
+#' F-statistics, P-value and R2 to score the interspecies phylogenetic signal
+#' strength. For interspecies analysis, the sequence names in fasta file must
+#' contain species names and sequence names separated with "_".
+#'
+#' If the resulted distance matrix contains Inf distance for pair of
+#' sequences A and B - it means that sequences do not have common subsequences
+#' of the length k. In the case of many Inf values in distance matrix - it
+#' will bias the community detection, so we recommend to use lower k (though
+#' lower k values increase the probability of random coincidences).
+#'
+#' @return An R list of results.
+#'
+#' @examples
+#' Res1 <- dna_pipeline_master("test1.fa")
+#' dn1 <- convert_to_DNA(res1, path_to_genome = "test1.fa")
+#' names(dn1) <- paste0("Species1_", names(dn))
+#' # ...
+#' Dna.final <- c(dn1, dn2, dn3.....dnn)
+#' writeXStringSet(Dna.final, "Dna.final.fa")
+#' dm <- percon_distance_matrix("Dna.final.fa", interspecies = TRUE)
+#'
+#' # MST visualization
+#' library(igraph)
+#' g <- graph_from_data_frame(dm[["mst"]], directed = FALSE,
+#'                            vertices = dm[["vertex_analysis"]])
+#' library(ggraph)
+#' ggraph(g, "backbone") +
+#'   geom_node_point(aes(colour = as.factor(Community))) +
+#'   geom_edge_link(aes(colour = weight)) +
+#'   theme_graph()
+#'
+#' @author
+#' Igor V Gorbenko <gorbenko@sifibr.irk.ru>,
+#' Karolina M. Zverintseva <….>
+#'
+#' @references
+#' Kazakov, A.E.; Shepelev, V.A.; Tumeneva, I.G.; Alexandrov, A.A.;
+#' Yurov, Y.B.; Alexandrov, I.A. Interspersed repeats are found predominantly
+#' in the "old" α satellite families. Genomics 2003, 82, 619-627,
+#' doi:https://doi.org/10.1016/S0888-7543(03)00182-4.
+#'
+#' @name percon_distance_matrix
+#' @export
+percon_distance_matrix <- function(fasta_file, k = 8L, n_iter = 100L, num_threads = 8L, return_mst = 1L, interspecies = 1L) {
+  .Call(`_SIRCFinder_percon_distance_matrix`, fasta_file, k, n_iter, num_threads, return_mst, interspecies)
+}

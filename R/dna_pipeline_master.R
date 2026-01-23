@@ -1,0 +1,133 @@
+#' Detect SIRC elements in eukaryotic genome fasta
+#'
+#' @description
+#' Performs detection of SIRC (Short Inverted Repeat Cassette) elements in
+#' user-provided genome FASTA file using a comprehensive C++-based algorithm.
+#'
+#' @param fasta_path Path to input genome FASTA file.
+#' @param chunk_size Size of genomic chunks in base pairs (default: 1000000).
+#' @param overlap Overlap size between chunks in base pairs (default: 1000).
+#' @param k_core K-mer size used for initial repeat detection (default: 10).
+#' @param min_repeats Minimum number of repeats required for positive
+#'   protocassette detection (default: 3).
+#' @param window_size Size of sliding window for similar k-mer search
+#'   in base pairs (default: 2000).
+#' @param step_size Step size between sliding window starts in base pairs,
+#'   determines window overlap (default: 1000).
+#' @param num_threads Number of threads for parallel processing using
+#'   RcppParallel (default: 4).
+#' @param min_matches Minimum number of matching nucleotides to consider
+#'   k-mers as similar (default: 8).
+#' @param max_search_offset Maximum search offset for k-mer extension in
+#'   base pairs (default: 1500).
+#' @param max_extension_length Maximum allowed length for Direct Repeats
+#'   in base pairs (default: 55).
+#' @param entropy_window_size Window size in nucleotides for Shannon's
+#'   entropy evaluation (default: 10).
+#' @param max_k Maximum k-mer size for complexity estimation; uses k-mers
+#'   of sizes 3 to max_k (default: 8).
+#' @param dr_threshold Complexity threshold for Direct Repeats (default: 0.5).
+#' @param spacer_threshold Complexity threshold for Spacers (default: 0.6).
+#' @param min_similarity Minimum similarity required for adding extra
+#'   Direct Repeats (default: 0.8).
+#' @param similarity_threshold Similarity threshold between Spacers and
+#'   Repeats (default: 0.9).
+#' @param spacer_similarity_threshold Threshold for interspacer similarity
+#'   (default: 0.3).
+#' @param heuristics Logical indicating whether to enable heuristic core
+#'   processing (extends cores in cases of proper matching core groups)
+#'   (default: TRUE).
+#'
+#' @details
+#' The \code{SIRCFinder()} function is a full C++ implementation of the
+#' SIRC detection algorithm, powered by Rcpp. The algorithm consists of
+#' 7 main stages:
+#'
+#' \enumerate{
+#'   \item \strong{Cores detection}: Parallel search of imperfect direct
+#'   repeats (80\% identity by default) in sliding windows. The algorithm
+#'   bypasses soft-masked regions and low-complexity regions.
+#'
+#'   \item \strong{Cores extension}: Detection of proper DR-spacer boundaries
+#'   by scanning for rapid Shannon entropy jumps at spacer start positions.
+#'
+#'   \item \strong{Splitting}: Protocassette splitting in cases of
+#'   improperly sized spacers.
+#'
+#'   \item \strong{Filtering}: Removal of protocassettes with improper
+#'   DR numbers.
+#'
+#'   \item \strong{Refinement}: Additional genome analysis to add missed
+#'   DRs to protocassettes.
+#'
+#'   \item \strong{DR-Spacer comparison}: Filter comparing spacers to
+#'   DR consensus to ensure no tandem repeats pass through.
+#'
+#'   \item \strong{Interspacer comparison}: Filter comparing spacers
+#'   with each other.
+#' }
+#'
+#' Found core groups (protocassettes) are separated to ensure proper
+#' spacer-DR size proportions. In case of overlaps, the protocassette with
+#' the best entropy weight is selected. For perfectly overlapped core groups
+#' (W = 1), the heuristic algorithm merges protocassette DRs, resulting in
+#' extended DR lengths.
+#'
+#' @return
+#' Returns an R list containing the following components:
+#' \itemize{
+#'   \item \code{dr_consensus}: Consensus sequences of Direct Repeats
+#'   \item \code{dr_length}: Length of Direct Repeats
+#'   \item \code{positions}: Genomic positions of DR starts
+#'   \item \code{dr_sequences}: Actual DR sequences
+#'   \item \code{sequence_name}: Name of the scanned sequence
+#' }
+#'
+#' @author
+#' Igor V Gorbenko \email{gorbenko@@sifibr.irk.ru}
+#' Karolina M. Zverintseva \email{zverincewa@@mail.ru}
+#'
+#' @references
+#' Gorbenko et al. (2026). SIRCFinder: detection of Short Inverted Repeat
+#' Cassettes in eukaryotic genomes. bioRxiv. (Reference to be added after
+#' manuscript submission)
+#'
+#' @examples
+#' \dontrun{
+#' # Basic usage with default parameters
+#' results <- SIRCFinder("genome.fasta")
+#'
+#' # Custom parameters for sensitive detection
+#' results <- SIRCFinder(
+#'   fasta_path = "genome.fasta",
+#'   chunk_size = 2000000,
+#'   min_repeats = 2,
+#'   num_threads = 8,
+#'   heuristics = TRUE
+#' )
+#'
+#' # Conservative parameters for high specificity
+#' results <- SIRCFinder(
+#'   fasta_path = "genome.fasta",
+#'   min_similarity = 0.9,
+#'   similarity_threshold = 0.95,
+#'   dr_threshold = 0.6,
+#'   spacer_threshold = 0.7
+#' )
+#' }
+#'
+#' @seealso
+#' \code{\link{convert_to_DNA}} for converting results to DNAStringSet objects,
+#' \code{\link{convert_to_granges}} for converting results to GRanges objects
+#'
+#' @export
+SIRCFinder <- function(fasta_path, chunk_size = 1000000L, overlap = 1000L,
+                       k_core = 10L, min_repeats = 3L, window_size = 2000L,
+                       step_size = 1000L, num_threads = 4L, min_matches = 8L,
+                       max_search_offset = 1500L, max_extension_length = 55L,
+                       entropy_window_size = 10L, max_k = 8L, dr_threshold = 0.5,
+                       spacer_threshold = 0.6, min_similarity = 0.8,
+                       similarity_threshold = 0.9, spacer_similarity_threshold = 0.3,
+                       heuristics = TRUE) {
+  .Call('_SIRCFinder_dna_pipeline_master', PACKAGE = 'SIRCFinder', fasta_path, chunk_size, overlap, k_core, min_repeats, window_size, step_size, num_threads, min_matches, max_search_offset, max_extension_length, entropy_window_size, max_k, dr_threshold, spacer_threshold, min_similarity, similarity_threshold, spacer_similarity_threshold, heuristics)
+}
