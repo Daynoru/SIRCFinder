@@ -16,15 +16,27 @@ the elements are helpful as stable anchors for synteny analysis.
 
 ``` r
 library(devtools)
+# Install SIRCFinder from GitHub
 devtools::install_github("Daynoru/SIRCFinderv2")
 ```
 
 # **Usage**
 
 ``` r
-library(SIRCFinder) 
-result <- SIRCFinder(“path_to_fasta_file”) 
-gff <-convert_to_granges(result)
+library(SIRCFinder)
+
+# Detect SIRC elements
+results <- SIRCFinder("path_to_fasta_file")
+
+# Convert results
+gr <- convert_to_granges(results) 
+dna <- convert_to_DNA(results, "Cassettes", "path_to_fasta_file")
+
+# Distance analysis
+dm <- percon_distance_matrix("path_to_fasta_file")
+
+# Remove scaffolds
+unscaffold(c("path_to_fasta_file1", "path_to_fasta_file2"))
 ```
 
 # **Principle**
