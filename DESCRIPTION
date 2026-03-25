@@ -3,8 +3,7 @@ Title: Detect SIRC elements in eukaryotic genome fasta
 Version: 1.0.0
 Authors@R: c(
     person("Igor", "Gorbenko", email = "gorbenko@sifibr.irk.ru", role = c("aut", "cre")),
-    person("Karolina", "Zverintseva", email = "zverinceva.karolina@gmail.com", role = c("aut", "cre"))
-)
+    person("Karolina", "Zverintseva", email = "zverinceva.karolina@gmail.com", role = c("aut", "cre")))
 Description: Performs detection of SIRC elements in user-provided fasta genome file.
 License: MIT + file LICENSE
 Encoding: UTF-8
