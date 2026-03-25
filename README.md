@@ -12,7 +12,14 @@ elements are useful for various bioinformatic research that improve our
 knowledge on complex processes of genome regulation and functions. Also,
 the elements are helpful as stable anchors for synteny analysis.
 
-# **Quick Start**
+# **Installation**
+
+``` r
+library(devtools)
+devtools::install_github("Daynoru/SIRCFinderv2")
+```
+
+# **Usage**
 
 ``` r
 library(SIRCFinder) 
