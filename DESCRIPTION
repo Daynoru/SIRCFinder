@@ -1,6 +1,6 @@
 Package: SIRCFinder
 Title: Detect SIRC elements in eukaryotic genome fasta
-Version: 0.1.0
+Version: 1.0.0
 Authors@R: 
     person("Igor", "Gorbenko", email = "gorbenko@sifibr.irk.ru", role = c("aut", "cre"))
 Description: Performs detection of SIRC elements in user-provided fasta genome file.
@@ -14,6 +14,4 @@ Imports:
     plyranges,
     Rcpp,
     RcppParallel
-Suggests: 
-    testthat (>= 3.0.0)
-Config/testthat/edition: 3
+
