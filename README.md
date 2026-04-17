@@ -1,4 +1,4 @@
-# SIRCFinder
+# SIRCFinder <img src="man/figures/logo.png" align="right" height="150" />
 For citation use:
 Short Interrupted Repeats Cassette (SIRC) ensembles of plant
 genomes reflects evolutionary route [(Gorbenko et al., 2026)](https://doi.org/10.64898/2026.03.27.714674)
