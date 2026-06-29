@@ -68,7 +68,7 @@ convert_to_DNA <- function(results, selection = "Cassettes", path_to_genome){
   }
 
 
-  gr <- convert_to_granges(res)
+  gr <- convert_to_granges(results)
 
   if(selection == "Cassettes"){
     gr <- gr %>% filter(type == "cassette")
