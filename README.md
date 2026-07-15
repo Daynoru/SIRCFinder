@@ -1,7 +1,10 @@
 # SIRCFinder <img src="man/figures/logo.png" align="right" height="150" />
 For citation use:
-Short Interrupted Repeats Cassette (SIRC) ensembles of plant
-genomes reflects evolutionary route [(Gorbenko et al., 2026)](https://doi.org/10.64898/2026.03.27.714674)
+Short Interrupted Repeats Cassette (SIRC) ensembles of plant nuclear
+genomes reflects evolutionary route of species [(Gorbenko et al., 2026)](https://doi.org/10.1016/j.compbiolchem.2026.109229);
+the paper freely available until 25.08.2026 [(link)](https://authors.elsevier.com/a/1nOPC5Fq7aj5zl)
+
+[preprint link](https://doi.org/10.64898/2026.03.27.714674) 
 
 # **Introduction**
 
